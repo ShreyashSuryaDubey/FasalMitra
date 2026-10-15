@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>{{ t.insights_title }}</h1>
+
+<section class="stats">
+  <div class="stat"><strong>{{ m.rows }}</strong><span>{{ t.rows }}</span></div>
+  <div class="stat"><strong>{{ m.n_crops }}</strong><span>{{ t.crops }}</span></div>
+  <div class="stat"><strong>{{ m.train_rows }}</strong><span>{{ t.train }}</span></div>
+  <div class="stat"><strong>{{ m.test_rows }}</strong><span>{{ t.test }}</span></div>
+  <div class="stat hi"><strong>{{ m.best_model }}</strong><span>{{ t.best }}</span></div>
+</section>
+
+<div class="two">
+  <section class="card">
+    <h2>{{ t.ins_models }}</h2>
+    <p class="muted">{{ t.ins_models_note }}</p>
+    <img src="{{ url_for('static', filename='charts/model_comparison.png') }}" alt="{{ t.ins_models }}">
+  </section>
+  <section class="card">
+    <h2>{{ t.ins_importance }}</h2>
+    <p class="muted">{{ t.ins_importance_note }}</p>
+    <img src="{{ url_for('static', filename='charts/feature_importance.png') }}" alt="{{ t.ins_importance }}">
+  </section>
+</div>
+
+<div class="two">
+  <section class="card">
+    <h2>{{ t.ins_explore }}</h2>
+    <p class="muted">{{ t.ins_explore_note }}</p>
+    <img src="{{ url_for('static', filename='charts/temp_vs_rain.png') }}" alt="{{ t.ins_explore }}">
+  </section>
+  <section class="card">
+    <h2>{{ t.ins_cm }}</h2>
+    <p class="muted">{{ t.ins_cm_note }}</p>
+    <img src="{{ url_for('static', filename='charts/confusion_matrix.png') }}" alt="{{ t.ins_cm }}">
+  </section>
+</div>
+{% endblock %}

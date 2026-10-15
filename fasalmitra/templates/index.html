@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block content %}
+
+<section class="card">
+  <h1>{{ t.form_title }}</h1>
+  <p class="muted">{{ t.form_hint }}</p>
+
+  <div class="presets">
+    <span>{{ t.presets }}</span>
+    <button type="button" class="chip" data-v="80,48,40,24,82,6.4,236">{{ t.preset_wet }}</button>
+    <button type="button" class="chip" data-v="40,68,80,19,17,7.3,80">{{ t.preset_dry }}</button>
+    <button type="button" class="chip" data-v="118,46,20,24,80,6.9,80">{{ t.preset_hot }}</button>
+  </div>
+
+  {% if errors %}
+  <div class="alert err">{{ t.errors }}<strong>{{ errors | join(', ') }}</strong></div>
+  {% endif %}
+
+  <form method="post" action="{{ url_for('index') }}" id="f">
+    <input type="hidden" name="lang" value="{{ lang }}">
+    <div class="grid">
+      {% for f in features %}
+      <label>
+        <span>{{ labels[f] }}{% if f in ['N','P','K'] %} <em>({{ t.unit_kg }})</em>{% endif %}</span>
+        <input type="number" step="any" required name="{{ f }}" id="{{ f }}"
+               min="{{ limits[f][0] }}" max="{{ limits[f][1] }}" value="{{ values.get(f, '') }}">
+      </label>
+      {% endfor %}
+    </div>
+    <button class="btn" type="submit">{{ t.submit }}</button>
+  </form>
+</section>
+
+{% if results %}
+<section id="results">
+  <h2>{{ t.result_title }}</h2>
+  {% for w in warnings %}<div class="alert warn">⚠ {{ w }}</div>{% endfor %}
+
+  <div class="cards">
+    {% for r in results %}
+    <article class="card crop {{ 'best' if loop.first }}">
+      <div class="crop-head">
+        <span class="rank">#{{ loop.index }}</span>
+        <h3>{{ r.name }}</h3>
+      </div>
+      <div class="meter" role="img" aria-label="{{ t.suitability }} {{ r.score }}%">
+        <div class="bar" style="width: {{ r.score }}%"></div>
+      </div>
+      <p class="score"><strong>{{ r.score }}%</strong> {{ t.suitability }}</p>
+
+      <h4>{{ t.why_title }}</h4>
+      <ul class="checks">
+        {% for c in r.checks %}
+        <li class="{{ c.status }}">
+          <span class="dot" aria-hidden="true">{{ '✓' if c.status == 'ok' else ('▲' if c.status == 'high' else '▼') }}</span>
+          <span class="nm">{{ labels[c.feature] }}</span>
+          <span class="val">{{ c.value }}</span>
+          <span class="rng">{{ c.low }}–{{ c.high }}</span>
+        </li>
+        {% endfor %}
+      </ul>
+
+      <h4>{{ t.advice_title }}</h4>
+      <ul class="advice">
+        {% for a in r.advice %}
+        <li class="{{ a.status }}">{{ a.text }}</li>
+        {% endfor %}
+      </ul>
+    </article>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+<script>
+  // Example buttons fill the form: N, P, K, temperature, humidity, ph, rainfall
+  const names = ["N","P","K","temperature","humidity","ph","rainfall"];
+  document.querySelectorAll(".chip").forEach(b => b.addEventListener("click", () => {
+    b.dataset.v.split(",").forEach((v, i) => document.getElementById(names[i]).value = v);
+  }));
+  {% if results %}document.getElementById("results").scrollIntoView({behavior: "smooth"});{% endif %}
+</script>
+{% endblock %}
